@@ -6,7 +6,6 @@ export class Agent {
     }
 
     step(gridSize, nearbyAgents = []) {
-        // По умолчанию — случайное движение
         const dir = Math.floor(Math.random() * 4);
         if (dir === 0 && this.x > 0) this.x--;
         if (dir === 1 && this.x < gridSize - 1) this.x++;
@@ -51,17 +50,45 @@ export class Animal extends Agent {
     }
 }
 
+export class Wolf extends Animal {
+    constructor(x, y) {
+        super(x, y, 3);
+        this.emoji = "🐺";
+    }
+
+    step(gridSize, nearbyAgents = []) {
+        const prey = nearbyAgents.find(
+            (a) => a instanceof Human || a instanceof Deer
+        );
+        if (prey) {
+            this.x += this.x <= prey.x ? 1 : -1;
+            this.y += this.y <= prey.y ? 1 : -1;
+        } else {
+            super.step(gridSize);
+        }
+
+        this.x = Math.max(0, Math.min(gridSize - 1, this.x));
+        this.y = Math.max(0, Math.min(gridSize - 1, this.y));
+    }
+}
+
 export class Deer extends Animal {
     constructor(x, y) {
         super(x, y, 1);
         this.emoji = "🦌";
     }
-}
 
-export class Wolf extends Animal {
-    constructor(x, y) {
-        super(x, y, 3);
-        this.emoji = "🐺";
+    step(gridSize, nearbyAgents = []) {
+        const threat = nearbyAgents.find((a) => a instanceof Wolf);
+        if (threat) {
+            this.x += this.x >= threat.x ? 1 : -1;
+            this.y += this.y >= threat.y ? 1 : -1;
+        } else {
+            super.step(gridSize);
+        }
+
+        this.x = Math.max(0, Math.min(gridSize - 1, this.x));
+        this.y = Math.max(0, Math.min(gridSize - 1, this.y));
     }
 }
 
@@ -70,7 +97,12 @@ export class Plant extends Agent {
         super(x, y);
         this.emoji = "🌿";
     }
+
+    step(gridSize, nearbyAgents = []) {
+
+    }
 }
+
 
 export class Simulation {
     constructor(gridSize) {
