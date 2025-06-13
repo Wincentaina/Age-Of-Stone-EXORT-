@@ -45,9 +45,9 @@ export default function App() {
             const type = rest[0];
             const count = parseInt(rest[1]) || 1;
             for (let i = 0; i < count; i++) {
-                if (type === "human") sim.addAgent("human");
-                if (type === "animal") sim.addAgent("animal");
-                if (type === "plant") sim.addAgent("plant");
+                if (["human", "animal", "plant", "deer", "wolf"].includes(type)) {
+                    sim.addAgent(type);
+                }
             }
             setTick((t) => t + 1);
         }
@@ -63,7 +63,13 @@ export default function App() {
         }
 
         if (action === "help") {
-            alert("Команды: add [human|animal|plant] [count], set speed [ms], clear, help");
+            alert(
+                "Команды:\n" +
+                "add [human|animal|plant|deer|wolf] [count]\n" +
+                "set speed [ms]\n" +
+                "clear\n" +
+                "help"
+            );
         }
     };
 

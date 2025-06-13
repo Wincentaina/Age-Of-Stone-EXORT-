@@ -1,4 +1,3 @@
-// DevConsole.jsx
 import React, { useState } from "react";
 
 export default function DevConsole({ onCommand }) {
