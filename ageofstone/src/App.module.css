@@ -1,0 +1,16 @@
+/* App.module.css */
+
+.grid {
+    display: grid;
+    border: 1px solid #ccc;
+}
+
+.cell {
+    width: 24px;
+    height: 24px;
+    border: 1px solid #ddd;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
