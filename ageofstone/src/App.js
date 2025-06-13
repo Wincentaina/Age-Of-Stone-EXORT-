@@ -1,8 +1,8 @@
-// App.jsx
 import React, { useState, useEffect, useRef } from "react";
 import { Simulation } from "./simulation/SimulationEngine";
 import styles from "./App.module.css";
 import ControlPanel from "./components/ControlPanel";
+import DevConsole from "./components/DevConsole";
 
 const GRID_SIZE = 20;
 const CELL_SIZE = 24;
@@ -11,19 +11,61 @@ export default function App() {
     const [sim, setSim] = useState(new Simulation(GRID_SIZE));
     const [tick, setTick] = useState(0);
     const [running, setRunning] = useState(false);
+    const [consoleVisible, setConsoleVisible] = useState(false);
+    const [speed, setSpeed] = useState(500);
     const intervalRef = useRef(null);
+
+    useEffect(() => {
+        const listener = (e) => {
+            if (e.key === "~") {
+                setConsoleVisible((v) => !v);
+            }
+        };
+        window.addEventListener("keydown", listener);
+        return () => window.removeEventListener("keydown", listener);
+    }, []);
 
     useEffect(() => {
         if (running) {
             intervalRef.current = setInterval(() => {
                 sim.step();
                 setTick((t) => t + 1);
-            }, 500);
+            }, speed);
         } else {
             clearInterval(intervalRef.current);
         }
         return () => clearInterval(intervalRef.current);
-    }, [running, sim]);
+    }, [running, sim, speed]);
+
+    const handleCommand = (cmd) => {
+        const args = cmd.trim().split(" ");
+        const [action, ...rest] = args;
+
+        if (action === "add") {
+            const type = rest[0];
+            const count = parseInt(rest[1]) || 1;
+            for (let i = 0; i < count; i++) {
+                if (type === "human") sim.addAgent("human");
+                if (type === "animal") sim.addAgent("animal");
+                if (type === "plant") sim.addAgent("plant");
+            }
+            setTick((t) => t + 1);
+        }
+
+        if (action === "set" && rest[0] === "speed") {
+            const val = parseInt(rest[1]);
+            if (!isNaN(val)) setSpeed(val);
+        }
+
+        if (action === "clear") {
+            sim.clear();
+            setTick((t) => t + 1);
+        }
+
+        if (action === "help") {
+            alert("Команды: add [human|animal|plant] [count], set speed [ms], clear, help");
+        }
+    };
 
     return (
         <div style={{ padding: 16 }}>
@@ -57,7 +99,10 @@ export default function App() {
                     </div>
                 ))}
             </div>
+
             <p style={{ marginTop: 12, fontSize: 14 }}>Tick: {tick}</p>
+
+            {consoleVisible && <DevConsole onCommand={handleCommand} />}
         </div>
     );
 }
