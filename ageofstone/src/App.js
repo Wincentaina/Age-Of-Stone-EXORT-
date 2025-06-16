@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Simulation } from "./simulation/SimulationEngine";
-import styles from "./App.module.css";
+import s from "./App.module.css";
 import ControlPanel from "./components/ControlPanel/ControlPanel";
 import DevConsole from "./components/DevConsole/DevConsole";
 
@@ -76,10 +76,8 @@ export default function App() {
     };
 
     return (
-        <div style={{ padding: 16 }}>
-            <h1 style={{ fontSize: 20, fontWeight: "bold", marginBottom: 16 }}>
-                Primitive Life Sim
-            </h1>
+        <div className={s.container}>
+            <h1 className={s.title}>Primitive Life Sim</h1>
 
             <ControlPanel
                 running={running}
@@ -98,17 +96,17 @@ export default function App() {
             />
 
             <div
-                className={styles.grid}
+                className={s.grid}
                 style={{ gridTemplateColumns: `repeat(${GRID_SIZE}, ${CELL_SIZE}px)` }}
             >
                 {sim.getGrid().map((cell, idx) => (
-                    <div key={idx} className={styles.cell}>
+                    <div key={idx} className={s.cell}>
                         {cell?.emoji || ""}
                     </div>
                 ))}
             </div>
 
-            <p style={{ marginTop: 12, fontSize: 14 }}>Tick: {tick}</p>
+            <p className={s.tick}>Tick: {tick}</p>
 
             {consoleVisible && <DevConsole onCommand={handleCommand} />}
         </div>
