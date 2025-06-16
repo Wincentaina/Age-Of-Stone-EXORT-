@@ -18,6 +18,8 @@ export default function App() {
     useEffect(() => {
         const listener = (e) => {
             if (e.key === "~") {
+                e.preventDefault();
+                e.stopPropagation();
                 setConsoleVisible((v) => !v);
             }
         };
