@@ -29,3 +29,63 @@
     margin-top: 12px;
     font-size: 14px;
 }
+
+.container {
+    padding: 16px;
+}
+
+.title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 16px;
+}
+
+.grid {
+    display: grid;
+    gap: 1px;
+    background: #ccc;
+    margin-top: 16px;
+    width: max-content; /* ← ЭТО важно */
+}
+
+.cell {
+    width: 24px;
+    height: 24px;
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    position: relative;
+}
+
+.tick {
+    margin-top: 12px;
+    font-size: 14px;
+}
+
+/* Новый стиль для нескольких агентов */
+.multiple {
+    font-size: 10px;
+    color: #888;
+    position: absolute;
+    bottom: 1px;
+    right: 2px;
+}
+
+/* Панель информации о клетке */
+.infoPopup {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    font-size: 14px;
+    max-width: 240px;
+    z-index: 10;
+}

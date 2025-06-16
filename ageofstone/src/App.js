@@ -14,6 +14,7 @@ export default function App() {
     const [consoleVisible, setConsoleVisible] = useState(false);
     const [speed, setSpeed] = useState(500);
     const intervalRef = useRef(null);
+    const [selectedCell, setSelectedCell] = useState(null);
 
     useEffect(() => {
         const listener = (e) => {
@@ -75,6 +76,13 @@ export default function App() {
         }
     };
 
+    const handleCellClick = (x, y) => {
+        const agents = sim.agents.filter((a) => a.x === x && a.y === y);
+        setSelectedCell({ x, y, agents });
+    };
+
+    const closeInfo = () => setSelectedCell(null);
+
     return (
         <div className={s.container}>
             <h1 className={s.title}>Primitive Life Sim</h1>
@@ -100,8 +108,13 @@ export default function App() {
                 style={{ gridTemplateColumns: `repeat(${GRID_SIZE}, ${CELL_SIZE}px)` }}
             >
                 {sim.getGrid().map((cell, idx) => (
-                    <div key={idx} className={s.cell}>
-                        {cell?.emoji || ""}
+                    <div
+                        key={idx}
+                        className={s.cell}
+                        onClick={() => handleCellClick(idx % GRID_SIZE, Math.floor(idx / GRID_SIZE))}
+                    >
+                        {cell.length > 0 ? cell[0].emoji : ""}
+                        {cell.length > 1 && <span className={s.multiple}>+{cell.length - 1}</span>}
                     </div>
                 ))}
             </div>
@@ -109,6 +122,20 @@ export default function App() {
             <p className={s.tick}>Tick: {tick}</p>
 
             {consoleVisible && <DevConsole onCommand={handleCommand} />}
+
+            {selectedCell && (
+                <div className={s.infoPopup}>
+                    <button onClick={closeInfo}>Close</button>
+                    <h3>Клетка ({selectedCell.x}, {selectedCell.y})</h3>
+                    <ul>
+                        {selectedCell.agents.map((agent, i) => (
+                            <li key={i}>
+                                {agent.emoji} {agent.constructor.name} {agent.dangerLevel ? `(Опасность: ${agent.dangerLevel})` : ""}
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
         </div>
     );
 }
