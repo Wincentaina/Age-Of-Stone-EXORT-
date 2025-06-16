@@ -1,4 +1,5 @@
 import React, {useState} from "react";
+import s from "./DevConsole.module.css"
 
 export default function DevConsole({ onCommand }) {
     const [input, setInput] = useState("");
@@ -11,12 +12,9 @@ export default function DevConsole({ onCommand }) {
     };
 
     return (
-        <div style={{
-            background: "#111", color: "#0f0", padding: "8px",
-            fontFamily: "monospace", marginTop: "12px"
-        }}>
+        <div className={s.console_text}>
             <div>$ <input
-                style={{ background: "black", color: "#0f0", border: "none", width: "90%" }}
+                className={s.console_style}
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}

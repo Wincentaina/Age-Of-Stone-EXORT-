@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { Simulation } from "./simulation/SimulationEngine";
 import styles from "./App.module.css";
 import ControlPanel from "./components/ControlPanel/ControlPanel";
-import DevConsole from "./components/DevConsole";
+import DevConsole from "./components/DevConsole/DevConsole";
 
 const GRID_SIZE = 20;
 const CELL_SIZE = 24;
