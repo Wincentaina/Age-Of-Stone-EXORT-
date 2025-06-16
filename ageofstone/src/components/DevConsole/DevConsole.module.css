@@ -1,0 +1,14 @@
+.console_style {
+    background: black;
+    color: #0f0;
+    border: none;
+    width: 90%;
+}
+
+.console_text {
+    background: #111;
+    color: #0f0;
+    padding: 8px;
+    font-family: monospace;
+    margin-top: 12px;
+}
