@@ -78,7 +78,7 @@ export class Simulation {
     step() {
         const agentsToStep = shuffle([...this.agents]);
         for (const agent of agentsToStep) {
-            const nearby = this.getNearbyAgents(agent.x, agent.y, 1);
+            const nearby = this.getNearbyAgents(agent.x, agent.y, 3);
             agent.step(this.gridSize, nearby);
         }
         this.resolveConflicts();
