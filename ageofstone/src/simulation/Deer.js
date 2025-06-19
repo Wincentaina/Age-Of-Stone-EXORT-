@@ -8,12 +8,16 @@ export class Deer extends Animal {
         this.emoji = "🦌";
     }
 
-    step(gridSize, nearbyAgents = []) {
+    step(gridSize, nearbyAgents = [], spawnCallback = () => {}) {
         const threat = nearbyAgents.find((a) => a instanceof Wolf);
         const plantsNearby = nearbyAgents.filter((a) => a instanceof Plant);
+        const otherDeer = nearbyAgents.filter((a) => a instanceof Deer);
 
         if (threat) {
             this.moveAwayFrom(threat.x, threat.y, gridSize);
+        } else if (this.energy >= 8 && otherDeer.length > 0 && Math.random() > 0.9) {
+            this.energy = this.energy - 4
+            spawnCallback(this.x, this.y)
         } else if (plantsNearby.length > 0) {
             const plant = plantsNearby[0];
             // Если олень ещё не в одной клетке с растением — двигайся к нему

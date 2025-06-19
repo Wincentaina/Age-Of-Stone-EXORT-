@@ -106,7 +106,17 @@ export class Simulation {
         const agentsToStep = shuffle([...this.agents]);
         for (const agent of agentsToStep) {
             const nearby = this.getNearbyAgents(agent.x, agent.y, 3);
-            agent.step(this.gridSize, nearby);
+            agent.step(this.gridSize, nearby, (x, y) => {
+                if (agent instanceof Deer) {
+                    this.agents.push(new Deer(x, y))
+                }
+                if (agent instanceof Human) {
+                    this.agents.push(new Human(x, y))
+                }
+                if (agent instanceof Wolf) {
+                    this.agents.push(new Wolf(x, y))
+                }
+            });
         }
 
         this.plantRandomly(0.001, 80);
