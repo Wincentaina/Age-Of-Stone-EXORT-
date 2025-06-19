@@ -36,6 +36,21 @@ export class Simulation {
         });
     }
 
+    plantRandomly(chancePerCell = 0.0025) {
+        for (let y = 0; y < this.gridSize; y++) {
+            for (let x = 0; x < this.gridSize; x++) {
+                if (Math.random() < chancePerCell) {
+                    const exists = this.agents.some(
+                        (a) => a.x === x && a.y === y && a instanceof Plant
+                    );
+                    if (!exists) {
+                        this.agents.push(new Plant(x, y));
+                    }
+                }
+            }
+        }
+    }
+
     getGrid() {
         const grid = Array(this.gridSize * this.gridSize)
             .fill(null)
@@ -58,6 +73,7 @@ export class Simulation {
             const wolves = agents.filter((a) => a instanceof Wolf);
             const humans = agents.filter((a) => a instanceof Human);
             const deers = agents.filter((a) => a instanceof Deer);
+            const plants = agents.filter((a) => a instanceof Plant)
 
             if (wolves.length > 0 && humans.length === 1) {
                 for (const human of humans) toRemove.add(human);
@@ -70,6 +86,10 @@ export class Simulation {
             if (humans.length > 1 && deers.length > 0) {
                 for (const deer of deers) toRemove.add(deer);
             }
+
+            if (deers.length > 0 && plants.length > 0) {
+                for (const plant of plants) toRemove.add(plant)
+            }
         }
 
         this.agents = this.agents.filter((a) => !toRemove.has(a));
@@ -81,6 +101,8 @@ export class Simulation {
             const nearby = this.getNearbyAgents(agent.x, agent.y, 3);
             agent.step(this.gridSize, nearby);
         }
+
+        this.plantRandomly(0.001);
         this.resolveConflicts();
     }
 
