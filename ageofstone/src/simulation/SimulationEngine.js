@@ -3,6 +3,7 @@ export class Agent {
         this.x = x;
         this.y = y;
         this.emoji = "❓";
+        this.energy = 10; // базовая энергия (можно расширить)
     }
 
     step(gridSize, nearbyAgents = []) {
@@ -22,31 +23,67 @@ export class Human extends Agent {
     }
 
     step(gridSize, nearbyAgents = []) {
-        // Периодически пересматриваем цель
-        if (!this.target || Math.random() < 0.1) {
-            const threat = nearbyAgents.find(a => a instanceof Animal && a.dangerLevel >= 2);
-            const prey = nearbyAgents.find(a => a instanceof Animal && a.dangerLevel === 1);
+        // Энергия тратится каждый шаг
+        this.energy = Math.max(0, this.energy - 1);
 
-            if (threat) {
-                this.target = { x: threat.x, y: threat.y, flee: true };
-            } else if (prey) {
-                this.target = { x: prey.x, y: prey.y, flee: false };
-            } else {
-                this.target = null;
+        // Ищем людей рядом для группировки
+        const humansNearby = nearbyAgents.filter((a) => a instanceof Human);
+
+        // Олени рядом (еда)
+        const deerNearby = nearbyAgents.filter((a) => a instanceof Deer);
+
+        // Волки рядом (угроза)
+        const wolvesNearby = nearbyAgents.filter((a) => a instanceof Wolf);
+
+        // Поведение: избегаем одиночества — идём к людям, если меньше 2 рядом
+        if (humansNearby.length < 2) {
+            // Ищем ближайшего человека (из всей популяции, не только nearby)
+            // Для простоты - двигаемся в случайном направлении пока не найдем цель
+            const groupTarget = humansNearby[0] || null;
+
+            if (groupTarget) {
+                this.moveTowards(groupTarget.x, groupTarget.y, gridSize);
+                return;
             }
+            // если никого нет - случайное движение
+            super.step(gridSize);
+            return;
         }
 
-        if (this.target) {
-            const dx = this.target.x - this.x;
-            const dy = this.target.y - this.y;
-            this.x += Math.sign(this.target.flee ? -dx : dx);
-            this.y += Math.sign(this.target.flee ? -dy : dy);
-        } else {
-            if (Math.random() < 0.15) {
-                super.step(gridSize);
-            }
+        // Если рядом >= 2 человека, охотимся на оленей
+        if (humansNearby.length >= 2 && deerNearby.length > 0) {
+            this.moveTowards(deerNearby[0].x, deerNearby[0].y, gridSize);
+            return;
         }
 
+        // Если рядом волки, бежим от них (в любом случае)
+        if (wolvesNearby.length > 0) {
+            // Бежим от ближайшего волка
+            const threat = wolvesNearby[0];
+            this.moveAwayFrom(threat.x, threat.y, gridSize);
+            return;
+        }
+
+        // Иначе случайное движение (включая шанс стоять на месте)
+        if (Math.random() < 0.15) {
+            super.step(gridSize);
+        }
+    }
+
+    moveTowards(targetX, targetY, gridSize) {
+        const dx = targetX - this.x;
+        const dy = targetY - this.y;
+        this.x += Math.sign(dx);
+        this.y += Math.sign(dy);
+        this.x = Math.max(0, Math.min(gridSize - 1, this.x));
+        this.y = Math.max(0, Math.min(gridSize - 1, this.y));
+    }
+
+    moveAwayFrom(targetX, targetY, gridSize) {
+        const dx = this.x - targetX;
+        const dy = this.y - targetY;
+        this.x += Math.sign(dx);
+        this.y += Math.sign(dy);
         this.x = Math.max(0, Math.min(gridSize - 1, this.x));
         this.y = Math.max(0, Math.min(gridSize - 1, this.y));
     }
@@ -66,13 +103,33 @@ export class Wolf extends Animal {
     }
 
     step(gridSize, nearbyAgents = []) {
-        const prey = nearbyAgents.find(a => a instanceof Human || a instanceof Deer);
-        if (prey) {
-            this.x += this.x <= prey.x ? 1 : -1;
-            this.y += this.y <= prey.y ? 1 : -1;
-        } else {
+        const prey = nearbyAgents.filter(a => a instanceof Human || a instanceof Deer);
+        const wolvesNearby = nearbyAgents.filter(a => a instanceof Wolf);
+
+        // Волк боится нападать, если рядом >= 2 человека (толпа)
+        const humansNearby = nearbyAgents.filter(a => a instanceof Human);
+        if (humansNearby.length >= 2) {
+            // Стадо людей — не атакуем
             super.step(gridSize);
+            return;
         }
+
+        // Волк атакует только если рядом >= 2 волка (стая)
+        if (wolvesNearby.length >= 2 && prey.length > 0) {
+            // Направляемся к первой жертве
+            this.moveTowards(prey[0].x, prey[0].y, gridSize);
+            return;
+        }
+
+        // Иначе волк просто случайно двигается
+        super.step(gridSize);
+    }
+
+    moveTowards(targetX, targetY, gridSize) {
+        const dx = targetX - this.x;
+        const dy = targetY - this.y;
+        this.x += Math.sign(dx);
+        this.y += Math.sign(dy);
         this.x = Math.max(0, Math.min(gridSize - 1, this.x));
         this.y = Math.max(0, Math.min(gridSize - 1, this.y));
     }
@@ -86,12 +143,18 @@ export class Deer extends Animal {
 
     step(gridSize, nearbyAgents = []) {
         const threat = nearbyAgents.find(a => a instanceof Wolf);
+        const plantsNearby = nearbyAgents.filter(a => a instanceof Plant);
+
         if (threat) {
             this.x += this.x >= threat.x ? 1 : -1;
             this.y += this.y >= threat.y ? 1 : -1;
+        } else if (plantsNearby.length > 0) {
+            this.x += this.x <= plantsNearby[0].x ? 1 : -1;
+            this.y += this.y <= plantsNearby[0].y ? 1 : -1;
         } else {
             super.step(gridSize);
         }
+
         this.x = Math.max(0, Math.min(gridSize - 1, this.x));
         this.y = Math.max(0, Math.min(gridSize - 1, this.y));
     }
@@ -108,6 +171,7 @@ export class Plant extends Agent {
     }
 }
 
+// Перемешивание массива для случайного порядка агентов в шаге
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
@@ -141,7 +205,9 @@ export class Simulation {
     }
 
     getGrid() {
-        const grid = Array(this.gridSize * this.gridSize).fill(null).map(() => []);
+        const grid = Array(this.gridSize * this.gridSize)
+            .fill(null)
+            .map(() => []);
         for (const agent of this.agents) {
             const index = agent.y * this.gridSize + agent.x;
             grid[index].push(agent);
@@ -161,13 +227,18 @@ export class Simulation {
             const humans = agents.filter((a) => a instanceof Human);
             const deers = agents.filter((a) => a instanceof Deer);
 
-            if (wolves.length > 0 && humans.length > 0) {
+            // Волки нападают на человека, если человек один
+            if (wolves.length > 0 && humans.length === 1) {
                 for (const human of humans) toRemove.add(human);
             }
+
+            // Волки нападают на оленя всегда
             if (wolves.length > 0 && deers.length > 0) {
                 for (const deer of deers) toRemove.add(deer);
             }
-            if (humans.length > 0 && deers.length > 0) {
+
+            // Люди охотятся на оленей только если их больше 1
+            if (humans.length > 1 && deers.length > 0) {
                 for (const deer of deers) toRemove.add(deer);
             }
         }
@@ -178,7 +249,7 @@ export class Simulation {
     step() {
         const agentsToStep = shuffle([...this.agents]);
         for (const agent of agentsToStep) {
-            const nearby = this.getNearbyAgents(agent.x, agent.y, 2);
+            const nearby = this.getNearbyAgents(agent.x, agent.y, 1);
             agent.step(this.gridSize, nearby);
         }
         this.resolveConflicts();
