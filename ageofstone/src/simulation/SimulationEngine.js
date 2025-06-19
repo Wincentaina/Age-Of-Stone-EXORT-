@@ -36,7 +36,12 @@ export class Simulation {
         });
     }
 
-    plantRandomly(chancePerCell = 0.0025) {
+    plantRandomly(chancePerCell = 0.0025, maxPlants = 100) {
+        let currentPlants = this.agents.filter(a => a instanceof Plant).length;
+        if (currentPlants >= maxPlants) return;
+
+        let added = 0;
+
         for (let y = 0; y < this.gridSize; y++) {
             for (let x = 0; x < this.gridSize; x++) {
                 if (Math.random() < chancePerCell) {
@@ -45,6 +50,8 @@ export class Simulation {
                     );
                     if (!exists) {
                         this.agents.push(new Plant(x, y));
+                        added++;
+                        if (currentPlants + added >= maxPlants) return;
                     }
                 }
             }
@@ -102,7 +109,7 @@ export class Simulation {
             agent.step(this.gridSize, nearby);
         }
 
-        this.plantRandomly(0.001);
+        this.plantRandomly(0.001, 80);
         this.resolveConflicts();
     }
 
