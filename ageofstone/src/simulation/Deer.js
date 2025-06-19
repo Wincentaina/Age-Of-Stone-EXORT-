@@ -13,16 +13,15 @@ export class Deer extends Animal {
         const plantsNearby = nearbyAgents.filter((a) => a instanceof Plant);
 
         if (threat) {
-            this.x += this.x >= threat.x ? 1 : -1;
-            this.y += this.y >= threat.y ? 1 : -1;
+            this.moveAwayFrom(threat.x, threat.y, gridSize);
         } else if (plantsNearby.length > 0) {
-            this.x += this.x <= plantsNearby[0].x ? 1 : -1;
-            this.y += this.y <= plantsNearby[0].y ? 1 : -1;
+            const plant = plantsNearby[0];
+            // Если олень ещё не в одной клетке с растением — двигайся к нему
+            if (this.x !== plant.x || this.y !== plant.y) {
+                this.moveTowards(plant.x, plant.y, gridSize);
+            }
         } else {
             super.step(gridSize);
         }
-
-        this.x = Math.max(0, Math.min(gridSize - 1, this.x));
-        this.y = Math.max(0, Math.min(gridSize - 1, this.y));
     }
 }

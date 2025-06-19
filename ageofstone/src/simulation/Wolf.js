@@ -28,6 +28,7 @@ export class Wolf extends Animal {
         super.step(gridSize);
     }
 
+    // волки пусть будут потупее :)
     moveTowards(targetX, targetY, gridSize) {
         const dx = targetX - this.x;
         const dy = targetY - this.y;
