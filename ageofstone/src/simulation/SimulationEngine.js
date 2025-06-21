@@ -3,6 +3,7 @@ import { Deer } from "./Deer.js";
 import { Wolf } from "./Wolf.js";
 import { Plant } from "./Plant.js";
 import { Animal } from "./Animal.js";
+import { shouldDie } from "./mortality.js";
 
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -114,21 +115,23 @@ export class Simulation {
         const agentsToStep = shuffle([...this.agents]);
         for (const agent of agentsToStep) {
             const nearby = this.getNearbyAgents(agent.x, agent.y, 3);
-            agent.step(this.gridSize, nearby, (x, y) => {
+            agent.step(this.gridSize, nearby, (x, y, energy=30) => {
                 if (agent instanceof Deer) {
-                    this.agents.push(new Deer(x, y))
+                    this.agents.push(new Deer(x, y, energy))
                 }
                 if (agent instanceof Human) {
-                    this.agents.push(new Human(x, y))
+                    this.agents.push(new Human(x, y, energy))
                 }
                 if (agent instanceof Wolf) {
-                    this.agents.push(new Wolf(x, y))
+                    this.agents.push(new Wolf(x, y, energy))
                 }
             });
         }
 
         this.plantRandomly(0.001, 80);
         this.resolveConflicts();
+        // Удаляем мёртвых агентов (энергия <= 0, старость и т.д.)
+        this.agents = this.agents.filter((a) => !shouldDie(a));
     }
 
     addAgent(type) {

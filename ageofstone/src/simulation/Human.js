@@ -3,10 +3,12 @@ import { Deer } from "./Deer.js";
 import { Wolf } from "./Wolf.js";
 
 export class Human extends Agent {
-    constructor(x, y) {
+    constructor(x, y, e=70) {
         super(x, y);
         this.emoji = "🧍";
         this.target = null;
+        this.maxAge = 180;
+        this.energy = e;
     }
 
     step(gridSize, nearbyAgents = [], spawnCallback = () => {}) {
@@ -36,9 +38,9 @@ export class Human extends Agent {
             this.moveAwayFrom(threat.x, threat.y, gridSize);
             return;
         }
-        else if (this.energy >= 18 && humansNearby.length > 0 && Math.random() > 0.9) {
-            this.energy = this.energy - 8
-            spawnCallback(this.x, this.y)
+        else if (this.energy >= 35 && humansNearby.length > 0 && Math.random() > 0.85) {
+            this.energy = this.energy - 12
+            spawnCallback(this.x, this.y, 30)
         }
 
         if (Math.random() < 0.15) {

@@ -1,9 +1,11 @@
 export class Agent {
-    constructor(x, y) {
+    constructor(x, y, e = 30) {
         this.x = x;
         this.y = y;
         this.emoji = "❓";
-        this.energy = 30; // базовая энергия (можно расширить)
+        this.maxAge = 100;
+        this.age = 0;
+        this.energy = e; // базовая энергия (можно расширить)
     }
 
     step(gridSize, nearbyAgents = []) {
@@ -12,6 +14,7 @@ export class Agent {
         else if (dir === 1 && this.x < gridSize - 1) this.x++;
         else if (dir === 2 && this.y > 0) this.y--;
         else if (dir === 3 && this.y < gridSize - 1) this.y++;
+        this.age++;
     }
 
     moveTowards(targetX, targetY, gridSize) {

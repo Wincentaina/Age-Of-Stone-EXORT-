@@ -3,9 +3,11 @@ import { Wolf } from "./Wolf.js";
 import { Plant } from "./Plant.js";
 
 export class Deer extends Animal {
-    constructor(x, y) {
+    constructor(x, y, e = 30) {
         super(x, y, 1);
         this.emoji = "🦌";
+        this.maxAge = 140;
+        this.energy = e;
     }
 
     step(gridSize, nearbyAgents = [], spawnCallback = () => {}) {
@@ -16,7 +18,7 @@ export class Deer extends Animal {
 
         if (threat) {
             this.moveAwayFrom(threat.x, threat.y, gridSize);
-        } else if (this.energy >= 20 && otherDeer.length > 0 && Math.random() > 0.85) {
+        } else if (this.energy >= 20 && otherDeer.length > 0 && Math.random() > 0.8) {
             this.energy = this.energy - 8
             spawnCallback(this.x, this.y)
         } else if (plantsNearby.length > 0) {
