@@ -3,6 +3,7 @@ import { Deer } from "./Deer.js";
 import { Wolf } from "./Wolf.js";
 import { Plant } from "./Plant.js";
 import { Animal } from "./Animal.js";
+import { shouldDie } from "./mortality.js";
 
 function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -36,7 +37,12 @@ export class Simulation {
         });
     }
 
-    plantRandomly(chancePerCell = 0.0025) {
+    plantRandomly(chancePerCell = 0.0025, maxPlants = 100) {
+        let currentPlants = this.agents.filter(a => a instanceof Plant).length;
+        if (currentPlants >= maxPlants) return;
+
+        let added = 0;
+
         for (let y = 0; y < this.gridSize; y++) {
             for (let x = 0; x < this.gridSize; x++) {
                 if (Math.random() < chancePerCell) {
@@ -45,6 +51,8 @@ export class Simulation {
                     );
                     if (!exists) {
                         this.agents.push(new Plant(x, y));
+                        added++;
+                        if (currentPlants + added >= maxPlants) return;
                     }
                 }
             }
@@ -88,7 +96,15 @@ export class Simulation {
             }
 
             if (deers.length > 0 && plants.length > 0) {
-                for (const plant of plants) toRemove.add(plant)
+                for (const deer of deers) {
+                    // Еда — одно растение на одного оленя
+                    const plant = plants.pop();
+                    if (!plant) break;
+
+                    toRemove.add(plant);
+                    deer.energy += 8;
+                    break;
+                }
             }
         }
 
@@ -99,11 +115,23 @@ export class Simulation {
         const agentsToStep = shuffle([...this.agents]);
         for (const agent of agentsToStep) {
             const nearby = this.getNearbyAgents(agent.x, agent.y, 3);
-            agent.step(this.gridSize, nearby);
+            agent.step(this.gridSize, nearby, (x, y, energy=30) => {
+                if (agent instanceof Deer) {
+                    this.agents.push(new Deer(x, y, energy))
+                }
+                if (agent instanceof Human) {
+                    this.agents.push(new Human(x, y, energy))
+                }
+                if (agent instanceof Wolf) {
+                    this.agents.push(new Wolf(x, y, energy))
+                }
+            });
         }
 
-        this.plantRandomly(0.001);
+        this.plantRandomly(0.001, 80);
         this.resolveConflicts();
+        // Удаляем мёртвых агентов (энергия <= 0, старость и т.д.)
+        this.agents = this.agents.filter((a) => !shouldDie(a));
     }
 
     addAgent(type) {

@@ -3,12 +3,15 @@ import { Human } from "./Human.js";
 import { Deer } from "./Deer.js";
 
 export class Wolf extends Animal {
-    constructor(x, y) {
+    constructor(x, y, e = 50) {
         super(x, y, 3);
         this.emoji = "🐺";
+        this.maxAge = 120;
+        this.energy = e;
     }
 
-    step(gridSize, nearbyAgents = []) {
+    step(gridSize, nearbyAgents = [], spawnCallback = () => {}) {
+        this.energy = Math.max(0, this.energy - 1);
         const prey = nearbyAgents.filter(
             (a) => a instanceof Human || a instanceof Deer
         );
@@ -25,9 +28,15 @@ export class Wolf extends Animal {
             return;
         }
 
+        else if (this.energy >= 35 && wolvesNearby.length > 0 && Math.random() > 0.85) {
+            this.energy = this.energy - 12
+            spawnCallback(this.x, this.y)
+        }
+
         super.step(gridSize);
     }
 
+    // волки пусть будут потупее :)
     moveTowards(targetX, targetY, gridSize) {
         const dx = targetX - this.x;
         const dy = targetY - this.y;
