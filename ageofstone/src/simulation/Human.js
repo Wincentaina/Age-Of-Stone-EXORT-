@@ -9,7 +9,7 @@ export class Human extends Agent {
         this.target = null;
     }
 
-    step(gridSize, nearbyAgents = []) {
+    step(gridSize, nearbyAgents = [], spawnCallback = () => {}) {
         this.energy = Math.max(0, this.energy - 1);
 
         const humansNearby = nearbyAgents.filter((a) => a instanceof Human);
@@ -35,6 +35,10 @@ export class Human extends Agent {
             const threat = wolvesNearby[0];
             this.moveAwayFrom(threat.x, threat.y, gridSize);
             return;
+        }
+        else if (this.energy >= 18 && humansNearby.length > 0 && Math.random() > 0.9) {
+            this.energy = this.energy - 8
+            spawnCallback(this.x, this.y)
         }
 
         if (Math.random() < 0.15) {

@@ -95,7 +95,15 @@ export class Simulation {
             }
 
             if (deers.length > 0 && plants.length > 0) {
-                for (const plant of plants) toRemove.add(plant)
+                for (const deer of deers) {
+                    // Еда — одно растение на одного оленя
+                    const plant = plants.pop();
+                    if (!plant) break;
+
+                    toRemove.add(plant);
+                    deer.energy += 8;
+                    break;
+                }
             }
         }
 

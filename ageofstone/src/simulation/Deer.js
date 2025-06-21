@@ -9,14 +9,15 @@ export class Deer extends Animal {
     }
 
     step(gridSize, nearbyAgents = [], spawnCallback = () => {}) {
+        this.energy = Math.max(0, this.energy - 1);
         const threat = nearbyAgents.find((a) => a instanceof Wolf);
         const plantsNearby = nearbyAgents.filter((a) => a instanceof Plant);
         const otherDeer = nearbyAgents.filter((a) => a instanceof Deer);
 
         if (threat) {
             this.moveAwayFrom(threat.x, threat.y, gridSize);
-        } else if (this.energy >= 8 && otherDeer.length > 0 && Math.random() > 0.9) {
-            this.energy = this.energy - 4
+        } else if (this.energy >= 20 && otherDeer.length > 0 && Math.random() > 0.85) {
+            this.energy = this.energy - 8
             spawnCallback(this.x, this.y)
         } else if (plantsNearby.length > 0) {
             const plant = plantsNearby[0];

@@ -8,7 +8,8 @@ export class Wolf extends Animal {
         this.emoji = "🐺";
     }
 
-    step(gridSize, nearbyAgents = []) {
+    step(gridSize, nearbyAgents = [], spawnCallback = () => {}) {
+        this.energy = Math.max(0, this.energy - 1);
         const prey = nearbyAgents.filter(
             (a) => a instanceof Human || a instanceof Deer
         );
@@ -23,6 +24,11 @@ export class Wolf extends Animal {
         if (wolvesNearby.length >= 2 && prey.length > 0) {
             this.moveTowards(prey[0].x, prey[0].y, gridSize);
             return;
+        }
+
+        else if (this.energy >= 14 && wolvesNearby.length > 0 && Math.random() > 0.9) {
+            this.energy = this.energy - 8
+            spawnCallback(this.x, this.y)
         }
 
         super.step(gridSize);

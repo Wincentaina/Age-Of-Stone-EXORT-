@@ -3,7 +3,7 @@ export class Agent {
         this.x = x;
         this.y = y;
         this.emoji = "❓";
-        this.energy = 10; // базовая энергия (можно расширить)
+        this.energy = 30; // базовая энергия (можно расширить)
     }
 
     step(gridSize, nearbyAgents = []) {
