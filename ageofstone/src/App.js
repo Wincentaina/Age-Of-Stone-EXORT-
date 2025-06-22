@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Simulation } from "./simulation/SimulationEngine";
+import { useRootStore } from "./stores/RootStore";
 import s from "./App.module.css";
 import ControlPanel from "./components/ControlPanel/ControlPanel";
 import DevConsole from "./components/DevConsole/DevConsole";
@@ -9,14 +10,19 @@ const GRID_SIZE = 20;
 const CELL_SIZE = 24;
 
 export default function App() {
-    const [sim, setSim] = useState(new Simulation(GRID_SIZE));
+    const { settings } = useRootStore();
+    const [sim, setSim] = useState(() => {
+        const simulation = new Simulation(settings.gridSize, settings.initialCounts);
+        simulation.settings = settings;
+        return simulation;
+    });
     const [tick, setTick] = useState(0);
     const [running, setRunning] = useState(false);
     const [consoleVisible, setConsoleVisible] = useState(false);
-    const [speed, setSpeed] = useState(500);
     const intervalRef = useRef(null);
     const [selectedCell, setSelectedCell] = useState(null);
 
+    // Toggle dev console on ~ key press
     useEffect(() => {
         const listener = (e) => {
             if (e.key === "~") {
@@ -29,18 +35,35 @@ export default function App() {
         return () => window.removeEventListener("keydown", listener);
     }, []);
 
+    // Simulation step runner
     useEffect(() => {
         if (running) {
             intervalRef.current = setInterval(() => {
                 sim.step();
                 setTick((t) => t + 1);
-            }, speed);
+            }, settings.tickSpeed);
         } else {
             clearInterval(intervalRef.current);
         }
         return () => clearInterval(intervalRef.current);
-    }, [running, sim, speed]);
+    }, [running, sim, settings.tickSpeed]);
 
+    // Reset simulation when key settings change
+    useEffect(() => {
+        const newSim = new Simulation(settings.gridSize, settings.initialCounts);
+        newSim.settings = settings;
+        setSim(newSim);
+        setTick(0);
+        setRunning(false);
+    }, [
+        settings.gridSize,
+        settings.initialCounts.humans,
+        settings.initialCounts.deer,
+        settings.initialCounts.wolves,
+        settings.initialCounts.plants,
+    ]);
+
+    // Console commands handler
     const handleCommand = (cmd) => {
         const args = cmd.trim().split(" ");
         const [action, ...rest] = args;
@@ -56,11 +79,6 @@ export default function App() {
             setTick((t) => t + 1);
         }
 
-        if (action === "set" && rest[0] === "speed") {
-            const val = parseInt(rest[1]);
-            if (!isNaN(val)) setSpeed(val);
-        }
-
         if (action === "clear") {
             sim.clear();
             setTick((t) => t + 1);
@@ -70,13 +88,13 @@ export default function App() {
             alert(
                 "Команды:\n" +
                 "add [human|animal|plant|deer|wolf] [count]\n" +
-                "set speed [ms]\n" +
                 "clear\n" +
                 "help"
             );
         }
     };
 
+    // Show info about cell on click
     const handleCellClick = (x, y) => {
         const agents = sim.agents.filter((a) => a.x === x && a.y === y);
         setSelectedCell({ x, y, agents });
@@ -98,7 +116,8 @@ export default function App() {
                         setTick((t) => t + 1);
                     }}
                     onReset={() => {
-                        const newSim = new Simulation(GRID_SIZE);
+                        const newSim = new Simulation(settings.gridSize, settings.initialCounts);
+                        newSim.settings = settings;
                         setSim(newSim);
                         setTick(0);
                         setRunning(false);
