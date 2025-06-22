@@ -1,0 +1,34 @@
+.fieldWrapper {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 16px;
+}
+
+.label {
+    font-weight: 600;
+    margin-bottom: 6px;
+    font-size: 14px;
+    color: #333;
+}
+
+.input {
+    width: 100%;
+    padding: 6px 8px;
+    font-size: 14px;
+    margin-bottom: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.slider {
+    width: 100%;
+    cursor: pointer;
+}
+
+.unit {
+    font-size: 12px;
+    color: #666;
+    margin-top: 4px;
+    align-self: flex-end;
+}

@@ -3,6 +3,7 @@ import { Simulation } from "./simulation/SimulationEngine";
 import s from "./App.module.css";
 import ControlPanel from "./components/ControlPanel/ControlPanel";
 import DevConsole from "./components/DevConsole/DevConsole";
+import SettingsPanel from "./components/SettingsPanel/SettingsPanel";
 
 const GRID_SIZE = 20;
 const CELL_SIZE = 24;
@@ -84,58 +85,61 @@ export default function App() {
     const closeInfo = () => setSelectedCell(null);
 
     return (
-        <div className={s.container}>
-            <h1 className={s.title}>Primitive Life Sim</h1>
+        <div className={s.appWrapper}>
+            <div className={s.container}>
+                <h1 className={s.title}>Primitive Life Sim</h1>
 
-            <ControlPanel
-                running={running}
-                onStart={() => setRunning(true)}
-                onPause={() => setRunning(false)}
-                onStep={() => {
-                    sim.step();
-                    setTick((t) => t + 1);
-                }}
-                onReset={() => {
-                    const newSim = new Simulation(GRID_SIZE);
-                    setSim(newSim);
-                    setTick(0);
-                    setRunning(false);
-                }}
-            />
+                <ControlPanel
+                    running={running}
+                    onStart={() => setRunning(true)}
+                    onPause={() => setRunning(false)}
+                    onStep={() => {
+                        sim.step();
+                        setTick((t) => t + 1);
+                    }}
+                    onReset={() => {
+                        const newSim = new Simulation(GRID_SIZE);
+                        setSim(newSim);
+                        setTick(0);
+                        setRunning(false);
+                    }}
+                />
 
-            <div
-                className={s.grid}
-                style={{ gridTemplateColumns: `repeat(${GRID_SIZE}, ${CELL_SIZE}px)` }}
-            >
-                {sim.getGrid().map((cell, idx) => (
-                    <div
-                        key={idx}
-                        className={s.cell}
-                        onClick={() => handleCellClick(idx % GRID_SIZE, Math.floor(idx / GRID_SIZE))}
-                    >
-                        {cell.length > 0 ? cell[0].emoji : ""}
-                        {cell.length > 1 && <span className={s.multiple}>+{cell.length - 1}</span>}
-                    </div>
-                ))}
-            </div>
-
-            <p className={s.tick}>Tick: {tick}</p>
-
-            {consoleVisible && <DevConsole onCommand={handleCommand} />}
-
-            {selectedCell && (
-                <div className={s.infoPopup}>
-                    <button onClick={closeInfo}>Close</button>
-                    <h3>Клетка ({selectedCell.x}, {selectedCell.y})</h3>
-                    <ul>
-                        {selectedCell.agents.map((agent, i) => (
-                            <li key={i}>
-                                <p>{agent.emoji} {agent.constructor.name} {agent.dangerLevel ? `(Опасность: ${agent.dangerLevel})` : ""} Energy: {agent.energy}</p>
-                            </li>
-                        ))}
-                    </ul>
+                <div
+                    className={s.grid}
+                    style={{ gridTemplateColumns: `repeat(${GRID_SIZE}, ${CELL_SIZE}px)` }}
+                >
+                    {sim.getGrid().map((cell, idx) => (
+                        <div
+                            key={idx}
+                            className={s.cell}
+                            onClick={() => handleCellClick(idx % GRID_SIZE, Math.floor(idx / GRID_SIZE))}
+                        >
+                            {cell.length > 0 ? cell[0].emoji : ""}
+                            {cell.length > 1 && <span className={s.multiple}>+{cell.length - 1}</span>}
+                        </div>
+                    ))}
                 </div>
-            )}
+
+                <p className={s.tick}>Tick: {tick}</p>
+
+                {consoleVisible && <DevConsole onCommand={handleCommand} />}
+
+                {selectedCell && (
+                    <div className={s.infoPopup}>
+                        <button onClick={closeInfo}>Close</button>
+                        <h3>Клетка ({selectedCell.x}, {selectedCell.y})</h3>
+                        <ul>
+                            {selectedCell.agents.map((agent, i) => (
+                                <li key={i}>
+                                    <p>{agent.emoji} {agent.constructor.name} {agent.dangerLevel ? `(Опасность: ${agent.dangerLevel})` : ""} Energy: {agent.energy}</p>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
+            </div>
+            <SettingsPanel />
         </div>
     );
 }
