@@ -3,7 +3,7 @@ import React, { createContext, useContext } from "react";
 import settings from "./simulationSettings";
 import ProfilesStore from "./profilesStore";
 
-class RootStore {
+export class RootStore {
     constructor() {
         this.settings = settings;
         this.profiles = new ProfilesStore(this.settings);

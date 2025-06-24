@@ -1,5 +1,5 @@
 import SettingField from "../SettingField/SettingField";
-import React from "react";
+import React, { useState } from "react";
 import { observer } from "mobx-react-lite";
 import { useRootStore } from "../../stores/RootStore";
 import { runInAction } from "mobx";
@@ -9,12 +9,16 @@ const profileNames = ["stable", "profile1", "profile2"];
 
 const SettingsPanel = observer(() => {
     const { settings, profiles } = useRootStore();
+    const [selectedProfileName, setSelectedProfileName] = useState("stable");
 
     const handleProfileClick = (name) => {
-        if (profiles.profiles[name]) {
-            profiles.loadProfile(name);
-        } else {
-            profiles.saveCurrentAsProfile(name);
+        setSelectedProfileName(name);
+        profiles.loadProfile(name); // ✅ Загрузка всех профилей, включая stable
+    };
+
+    const handleSaveProfile = () => {
+        if (selectedProfileName !== "stable") {
+            profiles.saveCurrentAsProfile(selectedProfileName);
         }
     };
 
@@ -27,13 +31,20 @@ const SettingsPanel = observer(() => {
                         key={name}
                         onClick={() => handleProfileClick(name)}
                         className={
-                            profiles.currentProfile === name ? s.activeProfileButton : s.profileButton
+                            selectedProfileName === name ? s.activeProfileButton : s.profileButton
                         }
                     >
                         {name}
                     </button>
                 ))}
             </div>
+            <button
+                className={s.saveProfileButton}
+                onClick={handleSaveProfile}
+                disabled={selectedProfileName === "stable"}
+            >
+                Сохранить профиль
+            </button>
 
             <h3 className={s.heading}>Настройки</h3>
 
