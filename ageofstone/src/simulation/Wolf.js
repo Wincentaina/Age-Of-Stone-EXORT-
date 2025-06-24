@@ -36,13 +36,13 @@ export class Wolf extends Animal {
         super.step(gridSize);
     }
 
-    // волки пусть будут потупее :)
-    moveTowards(targetX, targetY, gridSize) {
-        const dx = targetX - this.x;
-        const dy = targetY - this.y;
-        this.x += Math.sign(dx);
-        this.y += Math.sign(dy);
-        this.x = Math.max(0, Math.min(gridSize - 1, this.x));
-        this.y = Math.max(0, Math.min(gridSize - 1, this.y));
-    }
+    // // волки пусть будут потупее :)
+    // moveTowards(targetX, targetY, gridSize) {
+    //     const dx = targetX - this.x;
+    //     const dy = targetY - this.y;
+    //     this.x += Math.sign(dx);
+    //     this.y += Math.sign(dy);
+    //     this.x = Math.max(0, Math.min(gridSize - 1, this.x));
+    //     this.y = Math.max(0, Math.min(gridSize - 1, this.y));
+    // }
 }

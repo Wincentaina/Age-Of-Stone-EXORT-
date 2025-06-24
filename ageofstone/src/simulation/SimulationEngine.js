@@ -80,23 +80,29 @@ export class Simulation {
             const wolves = agents.filter((a) => a instanceof Wolf);
             const humans = agents.filter((a) => a instanceof Human);
             const deers = agents.filter((a) => a instanceof Deer);
-            const plants = agents.filter((a) => a instanceof Plant)
+            const plants = agents.filter((a) => a instanceof Plant);
 
+            // Волки нападают на человека, если человек один
             if (wolves.length > 0 && humans.length === 1) {
                 for (const human of humans) toRemove.add(human);
+                for (const wolf of wolves) wolf.energy += 15;
             }
 
+            // Волки нападают на оленя всегда
             if (wolves.length > 0 && deers.length > 0) {
                 for (const deer of deers) toRemove.add(deer);
+                for (const wolf of wolves) wolf.energy += 25;
             }
 
+            // Люди охотятся на оленей только если их больше 1
             if (humans.length > 1 && deers.length > 0) {
                 for (const deer of deers) toRemove.add(deer);
+                for (const human of humans) human.energy += 15;
             }
 
+            // Олени едят растения
             if (deers.length > 0 && plants.length > 0) {
                 for (const deer of deers) {
-                    // Еда — одно растение на одного оленя
                     const plant = plants.pop();
                     if (!plant) break;
 
