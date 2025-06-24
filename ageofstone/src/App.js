@@ -11,6 +11,7 @@ const CELL_SIZE = 24;
 
 export default function App() {
     const { settings } = useRootStore();
+    console.log(settings)
     const [sim, setSim] = useState(() => {
         const simulation = new Simulation(settings.gridSize, settings.initialCounts);
         simulation.settings = settings;

@@ -1,4 +1,4 @@
-import { makeAutoObservable } from "mobx";
+import {makeAutoObservable, reaction, runInAction} from "mobx";
 
 class SimulationSettings {
     gridSize = 20;
@@ -8,7 +8,7 @@ class SimulationSettings {
         humans: 5,
         deer: 5,
         wolves: 5,
-        plants: 5
+        plants: 5,
     };
 
     plantGrowthRate = 0.001;
@@ -18,17 +18,27 @@ class SimulationSettings {
     reproduction = {
         deerProbability: 0.2,
         humanProbability: 0.15,
-        wolfProbability: 0.05
+        wolfProbability: 0.05,
     };
 
     constructor() {
-        makeAutoObservable(this);
+        makeAutoObservable(this, {}, { autoBind: true }); // autoBind важно
         this.load();
+
+        // автоматическое сохранение при изменениях
+        reaction(
+            () => this.toJSON(),  // отслеживаемое состояние
+            (json) => {
+                this.save();
+            }
+        );
     }
 
     update(payload) {
-        Object.assign(this, payload);
-        this.save();
+        runInAction(() => {
+            Object.assign(this, payload);
+            this.save();
+        });
     }
 
     toJSON() {
@@ -39,7 +49,7 @@ class SimulationSettings {
             plantGrowthRate: this.plantGrowthRate,
             maxPlants: this.maxPlants,
             vision: this.vision,
-            reproduction: this.reproduction
+            reproduction: this.reproduction,
         };
     }
 
@@ -50,9 +60,18 @@ class SimulationSettings {
     load() {
         const saved = localStorage.getItem("sim-settings");
         if (saved) {
-            this.update(JSON.parse(saved));
+            const data = JSON.parse(saved);
+            runInAction(() => {
+                this.gridSize = data.gridSize;
+                this.tickSpeed = data.tickSpeed;
+                Object.assign(this.initialCounts, data.initialCounts);
+                this.plantGrowthRate = data.plantGrowthRate;
+                this.maxPlants = data.maxPlants;
+                this.vision = data.vision;
+                Object.assign(this.reproduction, data.reproduction);
+            });
         }
     }
 }
-
-export default new SimulationSettings();
+const simulationSettings = new SimulationSettings();
+export default simulationSettings;
