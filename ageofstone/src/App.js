@@ -152,7 +152,7 @@ export default function App() {
                         <ul>
                             {selectedCell.agents.map((agent, i) => (
                                 <li key={i}>
-                                    <p>{agent.emoji} {agent.constructor.name} {agent.dangerLevel ? `(Опасность: ${agent.dangerLevel})` : ""} Energy: {agent.energy}</p>
+                                    <p>{agent.emoji} {agent.constructor.name} {agent.dangerLevel ? `(Опасность: ${agent.dangerLevel})` : ""} {agent.energy ? `Energy: ${agent.energy}`: ""}</p>
                                 </li>
                             ))}
                         </ul>
