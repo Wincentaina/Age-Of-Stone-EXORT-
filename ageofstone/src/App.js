@@ -5,6 +5,7 @@ import s from "./App.module.css";
 import ControlPanel from "./components/ControlPanel/ControlPanel";
 import DevConsole from "./components/DevConsole/DevConsole";
 import SettingsPanel from "./components/SettingsPanel/SettingsPanel";
+import StatsPanel from "./components/StatsPanel/StatsPanel";
 
 const GRID_SIZE = 20;
 const CELL_SIZE = 24;
@@ -159,7 +160,11 @@ export default function App() {
                     </div>
                 )}
             </div>
-            <SettingsPanel />
+            <div className={s.side_panel}>
+                <StatsPanel sim={sim} tick={tick} />
+                <SettingsPanel />
+            </div>
+
         </div>
     );
 }
