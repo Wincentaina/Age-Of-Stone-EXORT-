@@ -14,15 +14,14 @@ function shuffle(array) {
 }
 
 export class Simulation {
-    constructor(gridSize) {
+    constructor(gridSize, initialCounts = { humans: 5, deer: 5, wolves: 5, plants: 5 }) {
         this.gridSize = gridSize;
         this.agents = [];
-        for (let i = 0; i < 5; i++) {
-            this.agents.push(new Human(this.rand(), this.rand()));
-            this.agents.push(new Deer(this.rand(), this.rand()));
-            this.agents.push(new Wolf(this.rand(), this.rand()));
-            this.agents.push(new Plant(this.rand(), this.rand()));
-        }
+        for (let i = 0; i < initialCounts.humans; i++) this.agents.push(new Human(this.rand(), this.rand()));
+        for (let i = 0; i < initialCounts.deer; i++) this.agents.push(new Deer(this.rand(), this.rand()));
+        for (let i = 0; i < initialCounts.wolves; i++) this.agents.push(new Wolf(this.rand(), this.rand()));
+        for (let i = 0; i < initialCounts.plants; i++) this.agents.push(new Plant(this.rand(), this.rand()));
+        this.settings = null;
     }
 
     rand() {
@@ -114,7 +113,7 @@ export class Simulation {
     step() {
         const agentsToStep = shuffle([...this.agents]);
         for (const agent of agentsToStep) {
-            const nearby = this.getNearbyAgents(agent.x, agent.y, 3);
+            const nearby = this.getNearbyAgents(agent.x, agent.y, this.settings?.vision ?? 3);
             agent.step(this.gridSize, nearby, (x, y, energy=30) => {
                 if (agent instanceof Deer) {
                     this.agents.push(new Deer(x, y, energy))
@@ -128,7 +127,7 @@ export class Simulation {
             });
         }
 
-        this.plantRandomly(0.001, 80);
+        this.plantRandomly(this.settings?.plantGrowthRate ?? 0.001, this.settings?.maxPlants ?? 80);
         this.resolveConflicts();
         // Удаляем мёртвых агентов (энергия <= 0, старость и т.д.)
         this.agents = this.agents.filter((a) => !shouldDie(a));
