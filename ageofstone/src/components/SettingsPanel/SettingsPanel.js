@@ -10,6 +10,7 @@ const profileNames = ["stable", "profile1", "profile2"];
 const SettingsPanel = observer(() => {
     const { settings, profiles } = useRootStore();
     const [selectedProfileName, setSelectedProfileName] = useState("stable");
+    const [justSaved, setJustSaved] = useState(false);
 
     const handleProfileClick = (name) => {
         setSelectedProfileName(name);
@@ -19,6 +20,8 @@ const SettingsPanel = observer(() => {
     const handleSaveProfile = () => {
         if (selectedProfileName !== "stable") {
             profiles.saveCurrentAsProfile(selectedProfileName);
+            setJustSaved(true);
+            setTimeout(() => setJustSaved(false), 1000);
         }
     };
 
@@ -39,11 +42,11 @@ const SettingsPanel = observer(() => {
                 ))}
             </div>
             <button
-                className={s.saveProfileButton}
+                className={`${s.saveProfileButton} ${justSaved ? s.success : ""}`}
                 onClick={handleSaveProfile}
                 disabled={selectedProfileName === "stable"}
             >
-                Сохранить профиль
+                {justSaved ? "Сохранено!" : "Сохранить профиль"}
             </button>
 
             <h3 className={s.heading}>Настройки</h3>
