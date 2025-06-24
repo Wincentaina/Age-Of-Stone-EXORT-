@@ -11,7 +11,6 @@ const CELL_SIZE = 24;
 
 export default function App() {
     const { settings } = useRootStore();
-    console.log(settings)
     const [sim, setSim] = useState(() => {
         const simulation = new Simulation(settings.gridSize, settings.initialCounts);
         simulation.settings = settings;
@@ -56,6 +55,7 @@ export default function App() {
         setSim(newSim);
         setTick(0);
         setRunning(false);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         settings.gridSize,
         settings.initialCounts.humans,
