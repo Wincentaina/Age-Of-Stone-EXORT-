@@ -60,6 +60,38 @@ const SettingsPanel = observer(() => {
                 step={50}
             />
             <SettingField
+                label="Стартовое кол-во людей"
+                value={settings.initialCounts.humans}
+                onChange={val => runInAction(() => { settings.initialCounts.humans = val})}
+                min={2}
+                max={200}
+                step={2}
+            />
+            <SettingField
+                label="Стартовое кол-во оленей"
+                value={settings.initialCounts.deer}
+                onChange={val => runInAction(() => {settings.initialCounts.deer = val})}
+                min={2}
+                max={200}
+                step={2}
+            />
+            <SettingField
+                label="Стартовое кол-во волков"
+                value={settings.initialCounts.wolves}
+                onChange={val => runInAction(() => {settings.initialCounts.wolves = val})}
+                min={2}
+                max={200}
+                step={2}
+            />
+            <SettingField
+                label="Стартовое кол-во растений"
+                value={settings.initialCounts.plants}
+                onChange={val => runInAction(() => {settings.initialCounts.plants = val})}
+                min={2}
+                max={200}
+                step={2}
+            />
+            <SettingField
                 label="Рост растений (0-1)"
                 value={settings.plantGrowthRate}
                 onChange={val => runInAction(() => { settings.plantGrowthRate = val })}
