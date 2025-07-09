@@ -5,6 +5,7 @@ import s from "./App.module.css";
 import ControlPanel from "./components/ControlPanel/ControlPanel";
 import DevConsole from "./components/DevConsole/DevConsole";
 import SettingsPanel from "./components/SettingsPanel/SettingsPanel";
+import StatsPanel from "./components/StatsPanel/StatsPanel";
 
 const GRID_SIZE = 20;
 const CELL_SIZE = 24;
@@ -152,14 +153,18 @@ export default function App() {
                         <ul>
                             {selectedCell.agents.map((agent, i) => (
                                 <li key={i}>
-                                    <p>{agent.emoji} {agent.constructor.name} {agent.dangerLevel ? `(Опасность: ${agent.dangerLevel})` : ""} Energy: {agent.energy}</p>
+                                    <p>{agent.emoji} {agent.constructor.name} {agent.dangerLevel ? `(Опасность: ${agent.dangerLevel})` : ""} {agent.energy ? `Energy: ${agent.energy}`: ""}</p>
                                 </li>
                             ))}
                         </ul>
                     </div>
                 )}
             </div>
-            <SettingsPanel />
+            <div className={s.side_panel}>
+                <StatsPanel sim={sim} tick={tick} />
+                <SettingsPanel />
+            </div>
+
         </div>
     );
 }

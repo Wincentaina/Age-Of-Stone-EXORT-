@@ -5,6 +5,7 @@ export class Plant extends Agent {
         super(x, y);
         this.emoji = "🌿";
         this.maxAge = 70;
+        this.energy = undefined
     }
 
     step(gridSize, nearbyAgents = []) {

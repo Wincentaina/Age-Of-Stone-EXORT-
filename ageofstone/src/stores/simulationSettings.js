@@ -1,15 +1,15 @@
-import {makeAutoObservable, reaction, runInAction} from "mobx";
+import {makeAutoObservable, reaction, runInAction, observable} from "mobx";
 
 class SimulationSettings {
     gridSize = 20;
     tickSpeed = 500;
 
-    initialCounts = {
+    initialCounts = observable.object({
         humans: 5,
         deer: 5,
         wolves: 5,
         plants: 5,
-    };
+    });
 
     plantGrowthRate = 0.001;
     maxPlants = 100;
@@ -27,8 +27,21 @@ class SimulationSettings {
 
         // автоматическое сохранение при изменениях
         reaction(
-            () => this.toJSON(),  // отслеживаемое состояние
-            (json) => {
+            () => [
+                this.gridSize,
+                this.tickSpeed,
+                this.plantGrowthRate,
+                this.maxPlants,
+                this.vision,
+                this.initialCounts.humans,
+                this.initialCounts.deer,
+                this.initialCounts.wolves,
+                this.initialCounts.plants,
+                this.reproduction.deerProbability,
+                this.reproduction.humanProbability,
+                this.reproduction.wolfProbability
+            ],
+            () => {
                 this.save();
             }
         );
